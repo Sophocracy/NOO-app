@@ -10,6 +10,7 @@
       --card: #18181b;
       --border: #27272a;
       --accent: #2563eb;
+      --accent-hover: #1d4ed8;
       --text: #f4f4f5;
       --text-muted: #a1a1aa;
     }
@@ -71,6 +72,10 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    button:active {
+      background-color: var(--accent-hover);
     }
     #outputContainer {
       margin-top: 16px;
@@ -154,65 +159,5 @@
       }
     }
   </script>
-</body>
-</html>
-      padding: 14px;
-      display: none;
-    }
-    .tag-badge {
-      display: inline-block;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 4px;
-      background-color: #1e293b;
-      color: #38bdf8;
-      border: 1px solid #0284c7;
-      margin-bottom: 12px;
-    }
-    .res-section { margin-bottom: 10px; }
-    .res-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
-    .res-val { font-size: 13px; line-height: 1.4; margin-top: 2px; }
-  </style>
-</head>
-<body>
-
-  <header>
-    <h1>ContextCheck AI</h1>
-    <p class="subtitle">Mobile Objective Fact & Context Engine</p>
-  </header>
-
-  <div class="input-group">
-    <label for="apiKey">Free Gemini API Key</label>
-    <input type="password" id="apiKey" placeholder="Paste API Key here..." autocomplete="off">
-  </div>
-
-  <div class="input-group">
-    <label for="claimInput">Claim / Quote / Post</label>
-    <textarea id="claimInput" placeholder="Paste viral claim, quote, or transcript snippet here..."></textarea>
-  </div>
-
-  <button id="verifyBtn">Verify Context</button>
-
-  <div id="outputContainer">
-    <div id="tagBadge" class="tag-badge">[PENDING]</div>
-    
-    <div class="res-section">
-      <div class="res-label">Verified Fact / Quote</div>
-      <div class="res-val" id="resFact">-</div>
-    </div>
-    
-    <div class="res-section">
-      <div class="res-label">Missing Context</div>
-      <div class="res-val" id="resMissing">-</div>
-    </div>
-    
-    <div class="res-section">
-      <div class="res-label">Dispute Breakdown</div>
-      <div class="res-val" id="resDispute">-</div>
-    </div>
-  </div>
-
-
 </body>
 </html>
