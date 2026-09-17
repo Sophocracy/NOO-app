@@ -133,14 +133,23 @@
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
 
-            const payload = {
+                  const payload = {
         system_instruction: {
-          parts: [{ text: `You are an real-time objective fact-checker. Today's date is September 2026. Evaluate all claims, viral quotes, and political events using up-to-date real-world context.` }]
+          parts: [{ 
+            text: `You are a real-time objective fact-checker. Today's date is September 2026. Evaluate all claims using up-to-date real-world context. Note that Zohran Mamdani is currently serving as the Mayor of New York City (assumed office Jan 1, 2026).
+
+CRITICAL VISUAL ANALYSIS DIRECTIVES:
+- Do not rely solely on news summaries or textual assumptions.
+- Evaluate physical geometry: measure spatial distance between individuals (e.g., whether people are standing close vs. 10+ feet apart).
+- Account for camera lens compression (telephoto lenses flattening depth).
+- Distinguish between direct personal interaction vs. independent, uncoordinated actions across a crowd.` 
+          }]
         },
         contents: [{
-          parts: [{ text: `Analyze the following claim for factual context, missing nuance, or misleading framing. Provide a direct breakdown:\n\nClaim: "${claim}"` }]
+          parts: [{ text: `Analyze the following claim and visual context:\n\nClaim: "${claim}"` }]
         }]
       };
+
 
 
       try {
