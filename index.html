@@ -133,11 +133,15 @@
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
 
-      const payload = {
+            const payload = {
+        system_instruction: {
+          parts: [{ text: `You are an real-time objective fact-checker. Today's date is September 2026. Evaluate all claims, viral quotes, and political events using up-to-date real-world context.` }]
+        },
         contents: [{
           parts: [{ text: `Analyze the following claim for factual context, missing nuance, or misleading framing. Provide a direct breakdown:\n\nClaim: "${claim}"` }]
         }]
       };
+
 
       try {
         const response = await fetch(url, {
