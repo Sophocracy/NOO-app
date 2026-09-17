@@ -108,13 +108,13 @@
     <label for="apiKey">Free Gemini API Key</label>
     <input type="password" id="apiKey" placeholder="Paste API key here">
 
-    <label for="claimInput">Claim / Quote / Context</label>
+    <label for="claimInput">Claim / Context</label>
     <textarea id="claimInput" placeholder="Describe the claim or event context..."></textarea>
 
     <label for="mediaInput">Visual Evidence (Image / Frame)</label>
     <input type="file" id="mediaInput" accept="image/*">
 
-    <button onclick="verifyClaim()">Verify Context & Geometry</button>
+    <button id="submitBtn" onclick="verifyClaim()">Verify Context & Geometry</button>
 
     <div id="outputContainer"></div>
   </div>
@@ -123,58 +123,74 @@
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onload = () => {
+          const base64String = reader.result.split(',')[1];
+          resolve(base64String);
+        };
         reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
       });
     }
 
     async function verifyClaim() {
       const apiKey = document.getElementById('apiKey').value.trim();
       const claim = document.getElementById('claimInput').value.trim();
-      const mediaFile = document.getElementById('mediaInput').files[0];
+      const mediaInput = document.getElementById('mediaInput');
+      const mediaFile = mediaInput.files[0];
       const outputContainer = document.getElementById('outputContainer');
+      const btn = document.getElementById('submitBtn');
 
       if (!apiKey) {
         alert('Please enter an API key.');
         return;
       }
 
+      btn.disabled = true;
+      btn.innerText = 'Processing...';
       outputContainer.style.display = 'block';
       outputContainer.innerHTML = 'Analyzing spatial geometry & context...';
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+      try {
+        const contentsParts = [];
 
-      const contentsParts = [];
+        if (mediaFile) {
+          const base64Data = await fileToBase64(mediaFile);
+          contentsParts.push({
+            inline_data: {
+              mime_type: mediaFile.type,
+              data: base64Data
+            }
+          });
+        }
 
-      if (mediaFile) {
-        const base64Data = await fileToBase64(mediaFile);
-        contentsParts.push({
-          inline_data: {
-            mime_type: mediaFile.type,
-            data: base64Data
-          }
-        });
-      }
+        if (claim) {
+          contentsParts.push({
+            text: `Analyze the provided visual evidence alongside this claim:\n\nClaim: "${claim}"`
+          });
+        } else if (!mediaFile) {
+          alert('Please enter text or upload an image.');
+          btn.disabled = false;
+          btn.innerText = 'Verify Context & Geometry';
+          outputContainer.style.display = 'none';
+          return;
+        }
 
-      contentsParts.push({
-        text: `Analyze the provided visual evidence alongside this claim:\n\nClaim: "${claim}"`
-      });
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
-      const payload = {
-        system_instruction: {
-          parts: [{ 
-            text: `You are an unyielding, objective spatial and behavioral parser. Evaluate video frames and images strictly based on visual facts.
+        const payload = {
+          system_instruction: {
+            parts: [{ 
+              text: `You are an unyielding, objective spatial and behavioral parser. Evaluate video frames and images strictly based on visual facts.
 
 DIRECTIVES:
 1. SPATIAL GEOMETRY & PROXIMITY: Measure physical space between key individuals. Audit empty buffer zones, standing distance, and whether subjects could have comfortably stood closer given surrounding spatial bounds.
 2. BEHAVIORAL ALIGNMENT: Audit facial expressions, micro-expressions (e.g., smiling/laughing), and body language against the solemnity or nature of the underlying event (e.g., name readings, formal ceremonies). Highlight any clear tonal mismatches.
 3. OBSTRUCTION AUDIT: State clearly whether physical obstacles or third parties exist in the gap between subjects, or if the space is completely clear and deliberate.` 
-          }]
-        },
-        contents: [{ parts: contentsParts }]
-      };
+            }]
+          },
+          contents: [{ parts: contentsParts }]
+        };
 
-      try {
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -192,6 +208,9 @@ DIRECTIVES:
       } catch (err) {
         alert(`Verification Failed: ${err.message}`);
         outputContainer.style.display = 'none';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Verify Context & Geometry';
       }
     }
   </script>
